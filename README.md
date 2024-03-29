@@ -40,3 +40,17 @@ To perform analysis on compressed images, run:
 ```bash
 python3 main.py --analyze
 ```
+
+Output will be in `data.json`
+```
+{
+  "jpeg": {
+    "dark-scene-1": {
+      "10": {
+        "size_ratio": 0.0176361406746537
+      },
+      "20": {
+        "size_ratio": 0.0214351615241386
+      },
+...
+```

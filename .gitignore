@@ -6,3 +6,4 @@ compressed/
 
 bin/
 
+*.json

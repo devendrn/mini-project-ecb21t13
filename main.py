@@ -1,6 +1,5 @@
 import argparse
-import config
-from scripts import compress
+from scripts import compress, analysis
 
 
 def main():
@@ -18,9 +17,9 @@ def main():
     args = parser.parse_args()
 
     if args.compress:
-        compress.run(config.FORMATS, config.REF_DIR, config.OUT_DIR)
+        compress.run()
     elif args.analyze:
-        print("Analyze stage not implemented yet")
+        analysis.run()
     else:
         print("No option specified. Use --help or -h to see usage.")
 
