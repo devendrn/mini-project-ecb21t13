@@ -1,7 +1,8 @@
 import glob
 import subprocess
 import platform
-from config import FORMATS, OUT_DIR, REF_DIR
+import os
+from config import FORMATS, OUT_DIR, REF_DIR, QUALITY_SETTINGS
 
 MAGICK_BIN = "bin/magick"
 if platform.system() == "Windows":
@@ -31,9 +32,11 @@ def run():
         print(f"- {format.upper()}:")
         for source in refImages:
             fileName = source[len(REF_DIR) + 1:-4]
-            for quality in range(10, 101, 10):
+            for quality in QUALITY_SETTINGS:
                 outFileName = f"{fileName}_{quality}.{format}"
                 output = f"{OUT_DIR}/{format}/{outFileName}"
+                if os.path.exists(output):
+                    continue
                 magick_compress(source, output, quality)
                 print(f"  - {fileName} - {quality}%", end="\r")
             print(f"  - {fileName}", " " * 7)

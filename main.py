@@ -1,5 +1,5 @@
 import argparse
-from scripts import compress, analysis
+from scripts import compress, analysis, evaluate
 
 
 def main():
@@ -14,12 +14,19 @@ def main():
         action="store_true",
         help="Analysis stage"
     )
+    parser.add_argument(
+        "--evaluate",
+        action="store_true",
+        help="Evaluation stage"
+    )
     args = parser.parse_args()
 
     if args.compress:
         compress.run()
     elif args.analyze:
         analysis.run()
+    elif args.evaluate:
+        evaluate.run()
     else:
         print("No option specified. Use --help or -h to see usage.")
 

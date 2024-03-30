@@ -1,9 +1,10 @@
 import glob
-from config import REF_DIR, OUT_DIR, FORMATS
+from config import REF_DIR, OUT_DIR, FORMATS, DATA_JSON
+from config import SIZE_RATIO_KEY, GRADE_GMSE_KEY
+
 import os
 import json
-# import sys
-# sys.path.append("..")
+from scripts import grade
 
 jsonData = {}
 
@@ -29,7 +30,7 @@ def run():
             analyze(image)
 
     jsonDataSorted = sortDict(jsonData)
-    with open('data.json', 'w') as jsonFile:
+    with open(DATA_JSON, 'w') as jsonFile:
         json.dump(jsonDataSorted, jsonFile, indent=2)
         print("Dumped analysis to data.json")
 
@@ -55,8 +56,11 @@ def analyze(compressedImage: str):
     if fileName not in jsonData[ext]:
         jsonData[ext][fileName] = {}
 
+    (gmsScore) = grade.runGrading(sourceImage, compressedImage)
+
     jsonData[ext][fileName][f"{quality}"] = {
-        "size_ratio": compressedImageSize/float(sourceImageSize)
+        SIZE_RATIO_KEY: compressedImageSize/float(sourceImageSize),
+        GRADE_GMSE_KEY: gmsScore,
     }
 
     print("-", fileName, quality)

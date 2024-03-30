@@ -4,6 +4,7 @@
 
 - Uncompressed PNG images in `reference`
 - [ImageMagick](https://imagemagick.org/script/download.php) binary in `bin`
+- Python libraries: Matplotlib, Pillow
 
 ```
 ├─ bin
