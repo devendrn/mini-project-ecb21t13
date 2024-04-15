@@ -13,6 +13,7 @@ FORMATS: [str] = [
 ]
 
 DATA_JSON: str = "data.json"
+SCORE_JSON: str = "score.json"
 
 QUALITY_SETTINGS: [int] = [
     10, 20, 30, 40, 50, 60, 70, 75,  80, 85, 90, 95, 97, 100

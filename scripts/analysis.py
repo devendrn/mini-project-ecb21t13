@@ -29,36 +29,63 @@ def run():
         for image in compressedImages:
             analyze(image)
 
+    # sort json data and dump to file
     jsonDataSorted = sortDict(jsonData)
     with open(DATA_JSON, 'w') as jsonFile:
         json.dump(jsonDataSorted, jsonFile, indent=2)
         print("Dumped analysis to data.json")
 
 
-def decodeFileDetails(encodedFileName: str) -> (str, str, str):
+def decodeFileDetails(encodedFileName: str) -> (str, str, str, str):
+    """
+    Decodes file details from compressed file name
+
+    Input:
+        format: "category%file_name%quality.format"
+
+    Outputs:
+        (catergory, file_name, quality, format)
+    """
+
     tmp = encodedFileName.split(".")
-    sourceFile = ''.join(tmp[:-1])
-    tmp2 = sourceFile.split("_")
-    fileName = '_'.join(tmp2[:-1])
-    quality = int(tmp2[-1])
+    fileNameArray = ''.join(tmp[:-1]).split("%")
+
+    category = fileNameArray[0]
+    fileName = fileNameArray[1]
+    quality = fileNameArray[2]
     format = tmp[-1]
-    return (fileName, quality, format)
+
+    return (category, fileName, quality, format)
 
 
 def analyze(compressedImage: str):
-    encodedFileName = '/'.join(compressedImage.split("/")[2:])
-    (fileName, quality, ext) = decodeFileDetails(encodedFileName)
+    """
+    Compares compressed image with reference image and updates jsonData
+    """
 
-    sourceImage = f"{REF_DIR}/{fileName}.png"
+    # get file details
+    encodedFileName = '/'.join(compressedImage.split("/")[2:])
+    (category, fileName, quality, ext) = decodeFileDetails(encodedFileName)
+
+    # get source location
+    sourceImage = f"{REF_DIR}/{category}/{fileName}.png"
+
+    # compare size
     sourceImageSize = os.stat(sourceImage).st_size
     compressedImageSize = os.stat(compressedImage).st_size
 
-    if fileName not in jsonData[ext]:
-        jsonData[ext][fileName] = {}
+    # initialize entries if not present
+    if category not in jsonData[ext]:
+        jsonData[ext][category] = {}
 
+    if fileName not in jsonData[ext][category]:
+        jsonData[ext][category][fileName] = {}
+
+    # calcuate quality scores
     (gmsScore) = grade.runGrading(sourceImage, compressedImage)
 
-    jsonData[ext][fileName][f"{quality}"] = {
+    # append results to jsonData
+    jsonData[ext][category][fileName][f"{quality}"] = {
         SIZE_RATIO_KEY: compressedImageSize/float(sourceImageSize),
         GRADE_GMSE_KEY: gmsScore,
     }

@@ -10,9 +10,14 @@
 ├─ bin
 │  ├─ magick.exe (If on Windows) 
 │  └─ magick     (If on Linux)
+│  
 ├─ reference
-│  ├─ dark-scene-1.png
-│  ├─ dark-scene-2.png
+│  ├─ dark_scene
+│  │  ├─ 1.png
+│  │  └─ ...
+│  ├─ shapes
+│  │  ├─ circles.png
+│  │  └─ ...
 │  └─ ...
 ```
 
@@ -27,12 +32,12 @@ Output will be in `compressed`
 ```
 ├─ compressed
 │  ├─ png
-│  │  ├─ dark-scene-1_10.png
-│  │  ├─ dark-scene-1_20.png
+│  │  ├─ dark_scene%1_10.png
+│  │  ├─ dark_scene%1_20.png
 │  │  └─ ...
 │  ├─ jpeg
-│  │  ├─ dark-scene-1_10.jpeg
-│  │  ├─ dark-scene-1_20.jpeg
+│  │  ├─ dark_scene%1_10.jpeg
+│  │  ├─ dark_scene%1_20.jpeg
 │  │  └─ ...
 │  └─ ...
 ```
@@ -49,9 +54,22 @@ Output will be in `data.json`
     "dark-scene-1": {
       "10": {
         "size_ratio": 0.0176361406746537
+        "gms_error": 0.8313982347987988
       },
       "20": {
         "size_ratio": 0.0214351615241386
+        "gms_error": 0.4203742394398733
       },
 ...
+```
+
+To perform evaluation on `data.json`, run
+```bash
+python3 main.py --evaluate
+```
+This will accumulate scores for all quality settings of an image into an array. Output will be stored in `score.json`.
+
+To clean all generated file, run:
+```bash
+./clean.sh
 ```
