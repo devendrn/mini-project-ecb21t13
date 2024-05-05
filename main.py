@@ -1,5 +1,5 @@
 import argparse
-from scripts import compress, analysis, evaluate
+from scripts import compress, analysis, pack_score
 
 
 def main():
@@ -15,9 +15,9 @@ def main():
         help="Analysis stage"
     )
     parser.add_argument(
-        "--evaluate",
+        "--score",
         action="store_true",
-        help="Evaluation stage"
+        help="Pack score"
     )
     args = parser.parse_args()
 
@@ -25,8 +25,8 @@ def main():
         compress.run()
     elif args.analyze:
         analysis.run()
-    elif args.evaluate:
-        evaluate.run()
+    elif args.score:
+        pack_score.run()
     else:
         print("No option specified. Use --help or -h to see usage.")
 

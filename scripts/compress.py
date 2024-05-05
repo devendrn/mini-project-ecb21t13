@@ -34,10 +34,10 @@ def run():
     for format in FORMATS:
         print(f"- {format.upper()}:")
         for source in refImages:
-            fileName = source[len(REF_DIR) + 1:-4].replace("/", "%")
+            fileName = source[len(REF_DIR) + 1:-4].replace("/", "_-_")
             for quality in QUALITY_SETTINGS:
                 # Output file name format = "category%name%quality.format"
-                outFileName = f"{fileName}%{quality}.{format}"
+                outFileName = f"{fileName}_-_{quality}.{format}"
                 output = f"{OUT_DIR}/{format}/{outFileName}"
                 if os.path.exists(output):
                     continue

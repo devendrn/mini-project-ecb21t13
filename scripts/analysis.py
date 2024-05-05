@@ -48,7 +48,7 @@ def decodeFileDetails(encodedFileName: str) -> (str, str, str, str):
     """
 
     tmp = encodedFileName.split(".")
-    fileNameArray = ''.join(tmp[:-1]).split("%")
+    fileNameArray = ''.join(tmp[:-1]).split("_-_")
 
     category = fileNameArray[0]
     fileName = fileNameArray[1]
@@ -94,6 +94,9 @@ def analyze(compressedImage: str):
 
 
 def sortDict(data: dict):
+    """
+    Sort dictionary including children
+    """
     def getKey(item):
         return f"{len(item)}{item}"
 
