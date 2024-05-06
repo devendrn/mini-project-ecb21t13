@@ -1,6 +1,6 @@
 import json
 from config import DATA_JSON, SCORE_JSON
-from config import SIZE_RATIO_KEY, GRADE_GMSE_KEY
+from config import SIZE_RATIO_KEY, GRADE_MSE_KEY, GRADE_H1E_KEY
 
 
 def run():
@@ -10,31 +10,33 @@ def run():
     f = open(DATA_JSON)
     data = json.load(f)
 
-    # score dict
-    result = {}
+    scores = {}
 
     for format in data:
         categories = data[format]
-        result[format] = {}
+        scores[format] = {}
 
         for category in categories:
             images = categories[category]
-            result[format][category] = {}
+            scores[format][category] = {}
 
             for image in images:
 
                 compressionRatio = []
-                gmsError = []
+                msError = []
+                h1Error = []
 
                 for q in images[image]:
                     compressionRatio.append(images[image][q][SIZE_RATIO_KEY])
-                    gmsError.append(images[image][q][GRADE_GMSE_KEY])
+                    msError.append(images[image][q][GRADE_MSE_KEY])
+                    h1Error.append(images[image][q][GRADE_H1E_KEY])
 
-                result[format][category][image] = {
-                    "compression_ratio": compressionRatio,
-                    "gms_error": gmsError,
+                scores[format][category][image] = {
+                    SIZE_RATIO_KEY: compressionRatio,
+                    GRADE_MSE_KEY: msError,
+                    GRADE_H1E_KEY: h1Error,
                 }
 
     with open(SCORE_JSON, 'w') as jsonFile:
-        json.dump(result, jsonFile, indent=2)
+        json.dump(scores, jsonFile, indent=2)
         print("Dumped score array to score.json")

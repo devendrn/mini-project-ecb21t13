@@ -1,6 +1,7 @@
 import glob
-from config import REF_DIR, OUT_DIR, FORMATS, DATA_JSON
-from config import SIZE_RATIO_KEY, GRADE_GMSE_KEY
+import subprocess
+from config import REF_DIR, OUT_DIR, FORMATS, DATA_JSON, DIFF_DIR
+from config import SIZE_RATIO_KEY, GRADE_MSE_KEY, GRADE_H1E_KEY
 
 import os
 import json
@@ -21,6 +22,12 @@ def run():
     data will be in JSON format and stored in root directory as
     data.json
     """
+    for format in FORMATS:
+        for score_name in [GRADE_MSE_KEY, GRADE_H1E_KEY]:
+            subprocess.run(
+                ["mkdir", "-p", f"{DIFF_DIR}/{score_name}/{format}"]
+            )
+
     initJsonData()
     formats = glob.glob(f"{OUT_DIR}/*/")
     for format in formats:
@@ -81,16 +88,15 @@ def analyze(compressedImage: str):
     if fileName not in jsonData[ext][category]:
         jsonData[ext][category][fileName] = {}
 
-    # calcuate quality scores
-    (gmsScore) = grade.runGrading(sourceImage, compressedImage)
+    print("-", fileName, quality)
+    (msScore, h1Score) = grade.runGrading(sourceImage, compressedImage)
 
     # append results to jsonData
     jsonData[ext][category][fileName][f"{quality}"] = {
         SIZE_RATIO_KEY: compressedImageSize/float(sourceImageSize),
-        GRADE_GMSE_KEY: gmsScore,
+        GRADE_MSE_KEY: msScore,
+        GRADE_H1E_KEY: h1Score,
     }
-
-    print("-", fileName, quality)
 
 
 def sortDict(data: dict):
