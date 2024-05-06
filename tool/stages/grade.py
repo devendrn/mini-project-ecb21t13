@@ -58,10 +58,10 @@ def ms_grade(compressed_img: Image.Image, source_img: Image.Image) -> (float, Im
 
     diff_array = np.asarray(diff)
     sq_diff_array = np.square(diff_array)
-    diffScore = np.mean(sq_diff_array)
+    diff_score = np.mean(sq_diff_array)
 
-    diffSaturated = diff.point(lambda i: normalize(i, diffScore))
-    return (diffScore, diffSaturated)
+    diff_saturated = diff.point(lambda i: normalize(i, diff_score))
+    return (diff_score, diff_saturated)
 
 
 def h1_grade(compressed_img: Image.Image, source_img: Image.Image) -> (float, Image.Image):

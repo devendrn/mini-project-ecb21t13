@@ -1,24 +1,27 @@
 import argparse
-from scripts import compress, analysis, pack_score, plot
+import stages.compress as compress_stage
+import stages.analyze as analysis_stage
+import stages.pack_score as score_stage
+import stages.plot as plot_stage
 
 
-def compress_cmd(args):
-    compress.run()
+def compress(args):
+    compress_stage.run()
 
 
-def analyzeCmd(args):
-    analysis.run()
+def analyze(args):
+    analysis_stage.run()
 
 
-def scoreCmd(args):
-    pack_score.run()
+def score(args):
+    score_stage.run()
 
 
-def plotCmd(args):
-    plot.run()
+def plot(args):
+    plot_stage.run()
 
 
-def main():
+def start():
     parser = argparse.ArgumentParser(description="Compression analysis")
     subparsers = parser.add_subparsers(title="Commands", required=True)
 
@@ -26,31 +29,27 @@ def main():
         "compress",
         help="Compresion stage"
     )
-    compress_parser.set_defaults(func=compress_cmd)
+    compress_parser.set_defaults(func=compress)
 
     analyze_parser = subparsers.add_parser(
         "analyze",
         help="Analysis stage"
     )
-    analyze_parser.set_defaults(func=analyzeCmd)
+    analyze_parser.set_defaults(func=analyze)
 
     score_parser = subparsers.add_parser(
         "score",
         help="Pack score date"
     )
-    score_parser.set_defaults(func=scoreCmd)
+    score_parser.set_defaults(func=score)
 
     plot_parser = subparsers.add_parser(
         "plot",
         help="Create plots from score data"
     )
-    plot_parser.set_defaults(func=plotCmd)
+    plot_parser.set_defaults(func=plot)
 
     args = parser.parse_args()
 
     if hasattr(args, "func"):
         args.func(args)
-
-
-if __name__ == "__main__":
-    main()

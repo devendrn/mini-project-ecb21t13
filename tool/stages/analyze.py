@@ -4,7 +4,7 @@ import os
 import json
 from config import REF_DIR, OUT_DIR, FORMATS, DATA_JSON, DIFF_DIR
 from config import SIZE_RATIO_KEY, GRADE_MSE_KEY, GRADE_H1E_KEY
-from scripts import grade
+from stages import grade
 
 json_data = {}
 
