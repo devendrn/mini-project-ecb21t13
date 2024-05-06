@@ -1,13 +1,10 @@
 import glob
 import subprocess
 import os
-# import platform
+import stages.util as util
 from config import FORMATS, OUT_DIR, REF_DIR, QUALITY_SETTINGS
 
-MAGICK_BIN = "bin/magick"
-
-# if platform.system() == "Windows":
-#    MAGICK_BIN += ".exe"
+MAGICK_BIN = "magick"
 
 
 def run():
@@ -30,20 +27,22 @@ def run():
         print(f"- {source}")
 
     print("Compressing source images: ")
-
     for format in FORMATS:
         print(f"- {format.upper()}:")
         for source in ref_images:
-            filename = source[len(REF_DIR) + 1:-4].replace("/", "_-_")
+            # source is in "reference/category/filename.png" format
+            filename_array = source[len(REF_DIR) + 1:-4].split("/")
+            category = filename_array[0]
+            filename = filename_array[1]
+
             for quality in QUALITY_SETTINGS:
-                # Output file name format = "category%name%quality.format"
-                out_filename = f"{filename}_-_{quality}.{format}"
+                out_filename = util.encode_filename(category, filename, quality, format)
                 output = f"{OUT_DIR}/{format}/{out_filename}"
                 if os.path.exists(output):
                     continue
                 magick_compress(source, output, quality)
-                print(f"  - {filename} - {quality}%", end="\r")
-            print(f"  - {filename}", " " * 7)
+                print(f"  - {category} - {filename} - {quality}%", end="\r")
+            print(f"  - {category} - {filename}", " " * 7)
 
     print()
 

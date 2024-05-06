@@ -1,0 +1,19 @@
+body {
+  text-align: center;
+}
+
+.flex-row {
+  display: flex;
+}
+
+canvas {
+  flex: 1;
+}
+
+h2 {
+  margin-top: 50px;
+}
+
+h3 {
+  margin: 50px 0 0 0;
+}

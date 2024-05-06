@@ -2,7 +2,6 @@ import argparse
 import stages.compress as compress_stage
 import stages.analyze as analysis_stage
 import stages.pack_score as score_stage
-import stages.plot as plot_stage
 
 
 def compress(args):
@@ -15,10 +14,6 @@ def analyze(args):
 
 def score(args):
     score_stage.run()
-
-
-def plot(args):
-    plot_stage.run()
 
 
 def start():
@@ -42,12 +37,6 @@ def start():
         help="Pack score date"
     )
     score_parser.set_defaults(func=score)
-
-    plot_parser = subparsers.add_parser(
-        "plot",
-        help="Create plots from score data"
-    )
-    plot_parser.set_defaults(func=plot)
 
     args = parser.parse_args()
 
