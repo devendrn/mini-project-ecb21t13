@@ -1,18 +1,17 @@
 import glob
 import subprocess
-from config import REF_DIR, OUT_DIR, FORMATS, DATA_JSON, DIFF_DIR
-from config import SIZE_RATIO_KEY, GRADE_MSE_KEY, GRADE_H1E_KEY
-
 import os
 import json
+from config import REF_DIR, OUT_DIR, FORMATS, DATA_JSON, DIFF_DIR
+from config import SIZE_RATIO_KEY, GRADE_MSE_KEY, GRADE_H1E_KEY
 from scripts import grade
 
-jsonData = {}
+json_data = {}
 
 
-def initJsonData():
+def init_json_data():
     for format in FORMATS:
-        jsonData[format] = {}
+        json_data[format] = {}
 
 
 def run():
@@ -28,22 +27,22 @@ def run():
                 ["mkdir", "-p", f"{DIFF_DIR}/{score_name}/{format}"]
             )
 
-    initJsonData()
+    init_json_data()
     formats = glob.glob(f"{OUT_DIR}/*/")
     for format in formats:
-        compressedImages = glob.glob(f"{format}*")
+        compressed_images = glob.glob(f"{format}*")
         print(format[:-1])
-        for image in compressedImages:
+        for image in compressed_images:
             analyze(image)
 
     # sort json data and dump to file
-    jsonDataSorted = sortDict(jsonData)
-    with open(DATA_JSON, 'w') as jsonFile:
-        json.dump(jsonDataSorted, jsonFile, indent=2)
+    json_data_sorted = sort_dict(json_data)
+    with open(DATA_JSON, 'w') as json_file:
+        json.dump(json_data_sorted, json_file, indent=2)
         print("Dumped analysis to data.json")
 
 
-def decodeFileDetails(encodedFileName: str) -> (str, str, str, str):
+def decode_file_details(encoded_filename: str) -> (str, str, str, str):
     """
     Decodes file details from compressed file name
 
@@ -54,59 +53,59 @@ def decodeFileDetails(encodedFileName: str) -> (str, str, str, str):
         (catergory, file_name, quality, format)
     """
 
-    tmp = encodedFileName.split(".")
-    fileNameArray = ''.join(tmp[:-1]).split("_-_")
+    tmp = encoded_filename.split(".")
+    filename_array = ''.join(tmp[:-1]).split("_-_")
 
-    category = fileNameArray[0]
-    fileName = fileNameArray[1]
-    quality = fileNameArray[2]
+    category = filename_array[0]
+    filename = filename_array[1]
+    quality = filename_array[2]
     format = tmp[-1]
 
-    return (category, fileName, quality, format)
+    return (category, filename, quality, format)
 
 
-def analyze(compressedImage: str):
+def analyze(compressed_image: str):
     """
     Compares compressed image with reference image and updates jsonData
     """
 
     # get file details
-    encodedFileName = '/'.join(compressedImage.split("/")[2:])
-    (category, fileName, quality, ext) = decodeFileDetails(encodedFileName)
+    encoded_filename = '/'.join(compressed_image.split("/")[2:])
+    (category, filename, quality, ext) = decode_file_details(encoded_filename)
 
     # get source location
-    sourceImage = f"{REF_DIR}/{category}/{fileName}.png"
+    source_image = f"{REF_DIR}/{category}/{filename}.png"
 
     # compare size
-    sourceImageSize = os.stat(sourceImage).st_size
-    compressedImageSize = os.stat(compressedImage).st_size
+    source_image_size = os.stat(source_image).st_size
+    compressed_image_size = os.stat(compressed_image).st_size
 
     # initialize entries if not present
-    if category not in jsonData[ext]:
-        jsonData[ext][category] = {}
+    if category not in json_data[ext]:
+        json_data[ext][category] = {}
 
-    if fileName not in jsonData[ext][category]:
-        jsonData[ext][category][fileName] = {}
+    if filename not in json_data[ext][category]:
+        json_data[ext][category][filename] = {}
 
-    print("-", fileName, quality)
-    (msScore, h1Score) = grade.runGrading(sourceImage, compressedImage)
+    print("-", filename, quality)
+    (ms_score, h1Score) = grade.run_grading(source_image, compressed_image)
 
     # append results to jsonData
-    jsonData[ext][category][fileName][f"{quality}"] = {
-        SIZE_RATIO_KEY: compressedImageSize/float(sourceImageSize),
-        GRADE_MSE_KEY: msScore,
+    json_data[ext][category][filename][f"{quality}"] = {
+        SIZE_RATIO_KEY: compressed_image_size/float(source_image_size),
+        GRADE_MSE_KEY: ms_score,
         GRADE_H1E_KEY: h1Score,
     }
 
 
-def sortDict(data: dict):
+def sort_dict(data: dict):
     """
     Sort dictionary including children
     """
-    def getKey(item):
+    def get_key(item):
         return f"{len(item)}{item}"
 
     if isinstance(data, dict):
-        return {key: sortDict(data[key]) for key in sorted(data, key=getKey)}
+        return {key: sort_dict(data[key]) for key in sorted(data, key=get_key)}
     else:
         return data

@@ -2,7 +2,7 @@ import argparse
 from scripts import compress, analysis, pack_score, plot
 
 
-def compressCmd(args):
+def compress_cmd(args):
     compress.run()
 
 
@@ -22,29 +22,29 @@ def main():
     parser = argparse.ArgumentParser(description="Compression analysis")
     subparsers = parser.add_subparsers(title="Commands", required=True)
 
-    compressParser = subparsers.add_parser(
+    compress_parser = subparsers.add_parser(
         "compress",
-        help="Compression stage"
+        help="Compresion stage"
     )
-    compressParser.set_defaults(func=compressCmd)
+    compress_parser.set_defaults(func=compress_cmd)
 
-    analyzeParser = subparsers.add_parser(
+    analyze_parser = subparsers.add_parser(
         "analyze",
         help="Analysis stage"
     )
-    analyzeParser.set_defaults(func=analyzeCmd)
+    analyze_parser.set_defaults(func=analyzeCmd)
 
-    scoreParser = subparsers.add_parser(
+    score_parser = subparsers.add_parser(
         "score",
         help="Pack score date"
     )
-    scoreParser.set_defaults(func=scoreCmd)
+    score_parser.set_defaults(func=scoreCmd)
 
-    plotParser = subparsers.add_parser(
+    plot_parser = subparsers.add_parser(
         "plot",
         help="Create plots from score data"
     )
-    plotParser.set_defaults(func=plotCmd)
+    plot_parser.set_defaults(func=plotCmd)
 
     args = parser.parse_args()
 

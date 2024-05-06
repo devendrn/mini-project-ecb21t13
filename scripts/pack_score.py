@@ -22,21 +22,21 @@ def run():
 
             for image in images:
 
-                compressionRatio = []
-                msError = []
-                h1Error = []
+                compression_ratio = []
+                ms_error = []
+                h1_error = []
 
                 for q in images[image]:
-                    compressionRatio.append(images[image][q][SIZE_RATIO_KEY])
-                    msError.append(images[image][q][GRADE_MSE_KEY])
-                    h1Error.append(images[image][q][GRADE_H1E_KEY])
+                    compression_ratio.append(images[image][q][SIZE_RATIO_KEY])
+                    ms_error.append(images[image][q][GRADE_MSE_KEY])
+                    h1_error.append(images[image][q][GRADE_H1E_KEY])
 
                 scores[format][category][image] = {
-                    SIZE_RATIO_KEY: compressionRatio,
-                    GRADE_MSE_KEY: msError,
-                    GRADE_H1E_KEY: h1Error,
+                    SIZE_RATIO_KEY: compression_ratio,
+                    GRADE_MSE_KEY: ms_error,
+                    GRADE_H1E_KEY: h1_error,
                 }
 
-    with open(SCORE_JSON, 'w') as jsonFile:
-        json.dump(scores, jsonFile, indent=2)
+    with open(SCORE_JSON, 'w') as json_file:
+        json.dump(scores, json_file, indent=2)
         print("Dumped score array to score.json")
