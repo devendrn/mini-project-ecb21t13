@@ -21,18 +21,29 @@ def run():
             scores[format][category] = {}
 
             for image in images:
+                # to sort errors based on compression ratio
+                errors = []
+                for q in images[image]:
+                    values = images[image][q]
+                    errors.append(
+                        [
+                            values[SIZE_RATIO_KEY],
+                            [values[GRADE_MSE_KEY], values[GRADE_H1E_KEY]]
+                        ]
+                    )
+                errors.sort(key=lambda x: x[0])
 
-                compression_ratio = []
+                cr = []
                 ms_error = []
                 h1_error = []
-
-                for q in images[image]:
-                    compression_ratio.append(images[image][q][SIZE_RATIO_KEY])
-                    ms_error.append(images[image][q][GRADE_MSE_KEY])
-                    h1_error.append(images[image][q][GRADE_H1E_KEY])
+                for i in errors:
+                    print(i)
+                    cr.append(i[0])
+                    ms_error.append(i[1][0])
+                    h1_error.append(i[1][1])
 
                 scores[format][category][image] = {
-                    SIZE_RATIO_KEY: compression_ratio,
+                    SIZE_RATIO_KEY: cr,
                     GRADE_MSE_KEY: ms_error,
                     GRADE_H1E_KEY: h1_error,
                 }

@@ -103,6 +103,5 @@ To clean all generated files, run:
 
 Data from `score.json` is visualized through HTML, with the help of `chart.js` library. 
 ```
-cd visualize
-python3 -m http.server
+python3 tool visualize
 ```
