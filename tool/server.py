@@ -6,7 +6,7 @@ WEB_DIR = "visualize"
 
 class CustomHttpRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
-        if self.path[-5:] == ".html" or self.path[-4:] == ".css" or self.path[-3:] == ".js" or self.path == "/":
+        if self.path[-5:] == ".html" or self.path[-4:] == ".css" or self.path[-3:] == ".js" or self.path == "/" or self.path[-4:] == ".ico":
             self.path = "/" + WEB_DIR + self.path
         return SimpleHTTPRequestHandler.do_GET(self)
 

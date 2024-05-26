@@ -21,11 +21,7 @@ def grade(compressed_img: Image.Image, source_img: Image.Image) -> (float, Image
     sq_diff_array = np.square(diff_array)
     diff_score = np.mean(sq_diff_array)
 
-    diff_saturated = diff.point(lambda i: normalize(i, diff_score))
-    return (diff_score, diff_saturated)
+    if diff_score > 0.0:
+        diff = diff.point(lambda i: 20.0 * abs(i * i) / diff_score)
 
-
-def normalize(val, mean):
-    if mean == 0.0:
-        return 0.0
-    return 20.0 * abs(val * val) / mean
+    return (diff_score, diff)

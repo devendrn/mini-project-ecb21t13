@@ -1,7 +1,7 @@
 import argparse
 import stages.compress as compress_stage
 import stages.analyze as analysis_stage
-import stages.pack_score as score_stage
+import stages.pack as pack_stage
 import server as visualize_server
 
 
@@ -13,8 +13,8 @@ def analyze(args):
     analysis_stage.run()
 
 
-def score(args):
-    score_stage.run()
+def pack(args):
+    pack_stage.run()
 
 
 def visualize(args):
@@ -37,11 +37,11 @@ def start():
     )
     analyze_parser.set_defaults(func=analyze)
 
-    score_parser = subparsers.add_parser(
-        "score",
-        help="Pack score date"
+    pack_parser = subparsers.add_parser(
+        "pack",
+        help="Pack data for visualization"
     )
-    score_parser.set_defaults(func=score)
+    pack_parser.set_defaults(func=pack)
 
     visualize_parser = subparsers.add_parser(
         "visualize",

@@ -8,82 +8,119 @@ const score = await fetch('/score.json').then((response) => response.json());
 
 const ct = document.getElementById('container');
 
-for (let format in score) {
-  const categories = score[format];
-  const title = document.createElement("div");
-  title.innerHTML = `<hr><h2>${format}</h2>`;
-  ct.append(title);
+let formats = "";
+for (let it in score) {
+  formats = formats + `<option value="${it}">${it.toUpperCase()}</option>`;
+}
 
-  for (let category in categories) {
-    const images = categories[category];
-  
-    const title = document.createElement("h3");
-    title.innerText = category;
-    ct.append(title);
+const grades = ["vbe", "mse"];
+let errors = "";
+grades.forEach(it => {
+  errors = errors + `<option value="${it}">${it.toUpperCase()}</option>`;
+});
 
-    let ms_error_dataset = [];
-    let h1_error_dataset = [];
+ct.innerHTML = `
+<input type="range" min="100" max="800" value="300" id="chart-aspect-slider">
+<select id="selected-format">${formats}</select>
+<select id="selected-error">${errors}</select>
+<select id="selected-category1"></select>
+<select id="selected-category2"></select>
+`;
+const sel_f = document.getElementById('selected-format');
+const sel_e = document.getElementById('selected-error');
+const sel_c1 = document.getElementById('selected-category1');
+const sel_c2 = document.getElementById('selected-category2');
 
+sel_f.onchange = plot;
+sel_e.onchange = plot;
+sel_c1.onchange = plot;
+sel_c2.onchange = plot;
+
+const style = document.documentElement.style;
+const slider = document.getElementById('chart-aspect-slider');
+slider.oninput = function() {
+  style.setProperty('--chart-height', slider.value + "px");
+}
+
+const canvas = document.createElement("canvas");
+Chart.defaults.font = {
+  family: "serif",
+  size: 15
+};
+const ch = new Chart(canvas, {
+  type: 'line',
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: { 
+      // x: { type: 'linear', min: 0, max: 0.7, ticks: { stepSize: 0.1 }},
+      x: { type: 'linear', min: 0, max: 0.8, ticks: { stepSize: 0.1 }},
+      y: { title: "hie", beginAtZero: true } 
+    }
+  }
+});
+const chart_ct = document.createElement('div');
+chart_ct.className = "chart-container"
+chart_ct.append(canvas);
+ct.append(chart_ct);
+
+plot();
+
+function plot() {
+  const categories = score[sel_f.value];
+
+  const prev_sc1 = sel_c1.value;
+  const prev_sc2 = sel_c2.value;
+  let categories_opt = '<option value="null">null</option>';
+  for (let it in categories) {
+    categories_opt = categories_opt + `<option value="${it}">${it}</option>`;
+  } 
+  sel_c1.innerHTML = categories_opt;
+  sel_c2.innerHTML = categories_opt;
+  if (prev_sc1 != "") {
+    sel_c1.value = prev_sc1;
+    sel_c2.value = prev_sc2;
+  }
+
+  let categories_selected = [sel_c1.value];
+  if (sel_c1.value != sel_c2.value) {
+    categories_selected.push(sel_c2.value);
+  }
+
+  let error_dataset = [];
+  categories_selected.forEach(cat => {
+    if (cat == null) {
+      return;
+    }
+    const images = categories[cat];
     for (let img in images) {
       let scores = images[img];
-      let ms_error = [];
-      let h1_error = [];
+      let error_scores = [];
 
       for (var i = 0; i < scores.size_ratio.length; i++) {
-        ms_error.push({
+        let error_scores_raw;
+        if (sel_e.value == "mse") {
+          error_scores_raw = scores.ms_error[i];
+        } else {
+          error_scores_raw = scores.h1_error[i];
+        }
+        error_scores.push({
           x: scores.size_ratio[i],
-          y: scores.ms_error[i]
-        });
-        h1_error.push({
-          x: scores.size_ratio[i],
-          y: scores.h1_error[i]
+          y: error_scores_raw
         });
       }
-
-      ms_error_dataset.push(
-        { label: img, data: ms_error, fill: false, tension: 0.1 }
-      );
-      h1_error_dataset.push(
-        { label: img, data: h1_error, fill: false, tension: 0.1 }
+      error_dataset.push(
+        { label: img, data: error_scores, fill: false, tension: 0.1 }
       );
     }
+  });
 
-    const canvas1 = document.createElement("canvas");
-    const canvas2 = canvas1.cloneNode();
-
-    new Chart(canvas1, {
-      type: 'line',
-      data: { datasets: ms_error_dataset },
-      options: {
-        responsive: true,
-        scales: { x: { type: 'linear', min: 0, max: 1, ticks: { stepSize: 0.1 }}, y: { beginAtZero: true } },
-        plugins: { title: { display: true, text: 'MS Error' } }
-      }
-    });
-
-
-    new Chart(canvas2, {
-      type: 'line',
-      data: { datasets: h1_error_dataset },
-      options: {
-        responsive: true,
-        scales: { x: { type: 'linear', min: 0, max: 1, ticks: { stepSize: 0.1 }}, y: { beginAtZero: true } },
-        plugins: { title: { display: true, text: 'H1 Error' } }
-      }
-    });
-
-    const canvas_container1 = document.createElement("div");
-    canvas_container1.classList.add('chart');
-    const canvas_container2 = canvas_container1.cloneNode();
-  
-    canvas_container1.append(canvas1);
-    canvas_container2.append(canvas2);
-
-    const row = document.createElement("div");
-    row.classList.add('chart-row');
-    row.append(canvas_container1);
-    row.append(canvas_container2);
-
-    ct.append(row);
+  ch.data.datasets = error_dataset;
+  ch.options.scales.x.title = {
+    text: "1/CR", display: true
   }
+  ch.options.scales.y.title = {
+    text: sel_e.value.toUpperCase(), display: true
+  }
+  ch.update();
 }

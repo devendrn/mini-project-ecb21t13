@@ -7,16 +7,17 @@ DIFF_DIR: str = "diff"
 FORMATS: [str] = [
     "jpeg",
     "webp",
-    "jxl",
-    "png",
+    # "jxl",
+    # "png",
     # "bpg",
 ]
 
 DATA_JSON: str = "data.json"
-SCORE_JSON: str = "visualize/score.json"
+SCORE_JSON: str = "score.json"
+DIFF_JSON: str = "diff.json"
 
 QUALITY_SETTINGS: [int] = [
-    10, 20, 30, 40, 50, 60, 70, 75,  80, 85, 90, 95, 97, 100
+    10, 20, 30, 40, 50, 60, 70, 75, 80, 85, 90, 95, 97, 100
 ]
 
 SIZE_RATIO_KEY: str = "size_ratio"

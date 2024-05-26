@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # folders
-rm compressed diff analysis -rf
+rm compressed diff -rf
 
 # output json files
 rm -f *.json

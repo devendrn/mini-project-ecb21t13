@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAGICK=bin/magick
+MAGICK=magick
 
 for image in reference/*/*.png; do
   echo "Stripping $image"

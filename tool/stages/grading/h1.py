@@ -75,11 +75,10 @@ def h1_pixel_error(c: [int], o: [int]) -> int:
     h_sa *= h_sa
     sensitivity = 1.0 - (h_sa*h_sa*h_sa)
     sensitivity = 1.0 - 0.25*(sensitivity*sensitivity)
-    sensitivity *= os / 255.0
 
-    eh = abs(cv - ov)
-    es = (abs(cs - cs) * ov) / 255
-    ev = (min(abs(ch - oh), ch + (255 - oh)) * ov) / 255
+    eh = (min(abs(ch - oh), ch + (255 - oh)) * ov * os) / (255 * 255)
+    es = (abs(cs - cs) * ov) / 255.0
+    ev = abs(cv - ov)
 
-    e = (eh + es + ev) * sensitivity
+    e = 10 * (0.33*eh + 0.29*es + 0.38*ev) * sensitivity
     return int(e)

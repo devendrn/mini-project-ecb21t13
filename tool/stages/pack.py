@@ -1,6 +1,8 @@
 import json
-from config import DATA_JSON, SCORE_JSON
+import glob
+from config import DATA_JSON, SCORE_JSON, DIFF_JSON
 from config import SIZE_RATIO_KEY, GRADE_MSE_KEY, GRADE_H1E_KEY
+from config import FORMATS, QUALITY_SETTINGS
 
 
 def run():
@@ -10,7 +12,15 @@ def run():
     f = open(DATA_JSON)
     data = json.load(f)
 
+    used_images = list(map(lambda s: "/".join(s[:-4].split("/")[1:]), glob.glob("reference/*/*.png")))
+
     scores = {}
+    diff = {
+        "images": used_images,
+        "formats": FORMATS,
+        "gradings": [GRADE_MSE_KEY, GRADE_H1E_KEY],
+        "qualities": QUALITY_SETTINGS
+    }
 
     for format in data:
         categories = data[format]
@@ -51,3 +61,7 @@ def run():
     with open(SCORE_JSON, 'w') as json_file:
         json.dump(scores, json_file, indent=2)
         print("Dumped score array to score.json")
+
+    with open(DIFF_JSON, 'w') as json_file:
+        json.dump(diff, json_file, indent=2)
+        print("Dumped diff data to diff.json")

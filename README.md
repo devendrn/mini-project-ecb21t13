@@ -88,9 +88,9 @@ Diff outputs will be stored in `diff` directory.
 
 To pack `data.json` for plotting, run:
 ```bash
-python3 tool score
+python3 tool pack 
 ```
-This will accumulate scores for all quality settings of an image into an array. The output will be stored in `score.json`.
+This will accumulate scores for all quality settings of an image into an array. The output will be stored in `score.json`. It will also generate a `diff.json` that will be useful for listing out the diff images.
 
 ### Clean
 

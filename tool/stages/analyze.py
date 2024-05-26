@@ -8,6 +8,7 @@ from config import SIZE_RATIO_KEY, GRADE_MSE_KEY, GRADE_H1E_KEY
 import stages.util as util
 import stages.grading.ms as ms_grade
 import stages.grading.h1 as h1_grade
+import threading
 
 
 json_data = {}
@@ -20,6 +21,16 @@ def run():
 
     Output data will be stored in root directory as `data.json`
     """
+    global json_data
+
+    try:
+        json_file = open(DATA_JSON, 'r')
+        json_data = json.load(json_file)
+        print('data.json loaded. Skipping files already processed.')
+    except FileNotFoundError:
+        print('data.json not found to resume from.')
+    except json.decoder.JSONDecodeError:
+        print('data.json found, but is empty.')
 
     # create folders for diff output
     for format in FORMATS:
@@ -30,14 +41,21 @@ def run():
 
     # initialize json data
     for format in FORMATS:
-        json_data[format] = {}
+        if format not in json_data:
+            json_data[format] = {}
 
     formats = glob.glob(f"{OUT_DIR}/*/")
     for format in formats:
         compressed_images = glob.glob(f"{format}*")
         print(format[:-1])
+        i = 0
         for image in compressed_images:
+            i = i + 1
             analyze(image)
+            if i % 4 == 0:
+                # update data.json after processing 4 images
+                with open(DATA_JSON, 'w') as json_file:
+                    json.dump(json_data, json_file)
 
     # sort json data and dump to file
     json_data_sorted = util.sort_dict(json_data)
@@ -61,6 +79,7 @@ def analyze(compressed_file: str):
     Scores are appended to 'json_data'.
     Diff images are saved to `diff/grade/format/` directory
     """
+    global json_data
 
     # get file details
     encoded_filename = '/'.join(compressed_file.split("/")[2:])
@@ -75,6 +94,10 @@ def analyze(compressed_file: str):
     if filename not in json_data[ext][category]:
         json_data[ext][category][filename] = {}
 
+    if f"{quality}" in json_data[ext][category][filename]:
+        print("-", category, "-", filename, quality, "skipped")
+        return
+
     compressed_img = Image.open(compressed_file)
     source_img = Image.open(source_file)
 
@@ -86,8 +109,17 @@ def analyze(compressed_file: str):
     source_img = source_img.convert('RGB')
 
     # compare diff error
-    (ms_score, ms_diff) = ms_grade.grade(compressed_img, source_img)
-    (h1_score, h1_diff) = h1_grade.grade(compressed_img, source_img)
+    # do in two separate threads
+    return_from_ms = [None]
+    return_from_h1 = [None]
+    t1 = threading.Thread(target=msgrade, args=(compressed_img, source_img, return_from_ms))
+    t2 = threading.Thread(target=h1grade, args=(compressed_img, source_img, return_from_h1))
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+    (ms_score, ms_diff) = return_from_ms[0]
+    (h1_score, h1_diff) = return_from_h1[0]
 
     # compare size
     source_file_size = os.stat(source_file).st_size
@@ -110,3 +142,11 @@ def analyze(compressed_file: str):
     diff_filename = ''.join(compressed_file[len(OUT_DIR):].split(".")[:-1]) + ".jpg"
     ms_diff.save(f"{DIFF_DIR}/{GRADE_MSE_KEY}{diff_filename}")
     h1_diff.save(f"{DIFF_DIR}/{GRADE_H1E_KEY}{diff_filename}")
+
+
+def h1grade(compressed_img: Image.Image, source_img: Image.Image, return_val: (float, Image.Image)):
+    return_val[0] = h1_grade.grade(compressed_img, source_img)
+
+
+def msgrade(compressed_img: Image.Image, source_img: Image.Image, return_val: (float, Image.Image)):
+    return_val[0] = ms_grade.grade(compressed_img, source_img)
